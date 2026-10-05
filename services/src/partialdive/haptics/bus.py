@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import heapq
 import itertools
+from collections import deque
 from dataclasses import dataclass, field
 
 from ..contracts import HapticEvent
@@ -74,7 +75,8 @@ class HapticBus:
         self.on_dispatch = on_dispatch  # callback(ScheduledCommand, now) for LSL logging / latency
         self._queue: list[ScheduledCommand] = []
         self._order = itertools.count()
-        self.dropped: list[tuple[int, str]] = []
+        # Recent drops only (e.g. zones with no actuator in this profile); bounded so long sessions don't grow.
+        self.dropped: deque[tuple[int, str]] = deque(maxlen=1000)
 
     def set_condition(self, condition: HapticCondition) -> None:
         self.condition = condition

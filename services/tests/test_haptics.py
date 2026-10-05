@@ -34,7 +34,7 @@ def test_disabled_condition_drops():
     b, t = bus(HapticCondition.from_params({"haptics_enabled": False}))
     b.handle(HapticEvent(1, 0.0, "contact", "chest", 1.0), now=0.0)
     b.tick(1.0)
-    assert t.lines == [] and b.dropped == [(1, "condition")]
+    assert t.lines == [] and list(b.dropped) == [(1, "condition")]
 
 
 def test_flow_sequence_and_reduced():
