@@ -93,7 +93,7 @@ Update this table as work progresses; details go in [research-log.md](research-l
 
 | Version | Status | Since |
 |---|---|---|
-| Phase 0 platform | 🟡 repo scaffolded | 2026-10-05 |
+| Phase 0 platform | 🟡 repo scaffolded; Unreal project + PartialDiveBridge + LSL building on UE 5.8 | 2026-10-05 |
 | V0 | ⚪ not started | |
 | V1 | ⚪ not started | |
 | V2 | ⚪ not started | |

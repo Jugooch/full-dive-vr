@@ -1,28 +1,43 @@
 # PartialDiveVR (Unreal project) — specification
 
-This folder will hold the Unreal project once it is created (see [`../README.md`](../README.md)).
-Until then this file is the spec the project must implement. It is derived from
+The Unreal project is in [`PartialDiveVR/`](PartialDiveVR/) (setup: [`../README.md`](../README.md)).
+This file is the spec the project implements. It is derived from
 [`docs/research/04-research-program-guide.md`](../../docs/research/04-research-program-guide.md) and
 the experiment protocols in [`experiments/`](../../experiments/).
 
-## Plugin: `PartialDiveBridge` (C++, Blueprint-exposed)
+## Plugin: `PartialDiveBridge` (implemented, v0.1.0)
 
-A `UGameInstanceSubsystem` that owns all I/O with the Python services (contracts in [`/schemas`](../../schemas)).
+Source: `PartialDiveVR/Plugins/PartialDiveBridge/`. A `UGameInstanceSubsystem` (+ tickable) that owns all
+I/O with the Python services (contracts in [`/schemas`](../../schemas)). Get it in Blueprint with
+**Get Game Instance Subsystem → PartialDiveBridgeSubsystem**.
 
-| Direction | What | Transport |
-|---|---|---|
-| in | `IntentFrame` (latest-wins; expose as a Blueprint struct + `OnIntentFrame` event) | UDP `127.0.0.1:47800` |
-| in | `BlockStart` (`block/1`) → `OnBlockStart(Code, Params)` | UDP `127.0.0.1:47803` |
-| in | `ChantPhrase` (V4) → `OnChantPhrase` | UDP `127.0.0.1:47802` |
-| out | `HapticEvent` (`EmitHaptic(Kind, Zone, Strength, DurationMs, Path, StepMs)`) | UDP `127.0.0.1:47801` |
-| out | game markers (trial start/end, cue, collision, cast) | LSL `pdive.game` |
+| Direction | What | Transport | Blueprint |
+|---|---|---|---|
+| in | `intent-frame/1` | UDP `127.0.0.1:47800` | `GetIntent()` (poll each tick) or `OnIntentFrame` event |
+| in | `block/1` | UDP `127.0.0.1:47803` | `OnBlockStart(Block)`, `GetBlockParamNumber/String/Bool(Key, Default)`, `GetActiveBlock().Code` |
+| in | `chant-phrase/1` (V4) | UDP `127.0.0.1:47802` | `OnChantPhrase` |
+| out | `haptic-event/1` | UDP `127.0.0.1:47801` | `EmitHaptic(Kind, Zone, Strength, DurationMs)`, `EmitHapticFlow(Path, ...)`, `StopAllHaptics()` |
+| out | game markers | LSL `pdive.game` | `PushGameMarker(EventName, Fields)` → `{"event","t",...}` |
+| — | shared clock | LSL | `GetLslClock()` |
 
-Requirements:
-- Timestamps on outgoing events use the **LSL clock** (`lsl_local_clock`) so the haptic bus can compute
-  delays and the XDF lines up.
-- Stale-intent safety: if no `IntentFrame` arrives for 250 ms, treat all intents as 0 (avatar stops).
-- An **input-source switch** (`joystick | intent`) at runtime, so baselines (006 joystick, 103 button)
-  use the same scene.
+Built in:
+- **Stale-intent safety:** no `IntentFrame` for 250 ms → `GetIntent()` returns all zeros (avatar stops),
+  `OnIntentStaleChanged` fires and an `intent_stale` / `intent_resumed` marker is pushed.
+- **Input-source switch:** `SetInputSource(Intent | Controller)` for the joystick (006) and button (103)
+  baselines in the same scene. In `Controller` mode, `GetIntent()` returns zeros and logs an `input_source` marker.
+- Outgoing haptic timestamps use the LSL clock, so the haptic bus can apply delays and the XDF lines up.
+- Ports and the 250 ms timeout are config: `Config/DefaultGame.ini` →
+  `[/Script/PartialDiveBridge.PartialDiveBridgeSubsystem]` `IntentPort=…`, `StaleIntentSeconds=…`.
+- Unit tests: `PartialDive.Json.*` (IntentFrame parsing incl. omitted zero channels, block, haptic JSON).
+
+**Debug overlay:** console variable `pdive.debug` (default **1** in editor builds, 0 in packaged builds).
+Shows intent LIVE/STALE + rate, all channels, block **code** (never params) and the last haptic event.
+Network input is drained at the **start** of each world tick, so every actor sees the newest intent the
+same frame it arrives.
+
+Smoke test without hardware: run `partialdive dev` (repo root, PowerShell), press Play, and read the overlay.
+Haptics: call `EmitHaptic(Contact, RightForearm)` from any Blueprint; the `dev` status line shows the
+resulting actuator command.
 
 ## Content plan
 

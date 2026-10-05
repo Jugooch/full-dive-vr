@@ -46,19 +46,40 @@ EEG is a separate track that upgrades the intent source once Phases 1–4 work. 
 
 ## Quick start (no hardware needed)
 
-```bash
-git lfs install
-python -m venv .venv && . .venv/bin/activate         # Windows: .venv\Scripts\activate
-pip install -e "services[hardware,lsl,dev]"
-pytest services/tests
+Run these in **PowerShell on Windows**, from the repo root, not in WSL: Unreal runs on Windows and
+localhost UDP from WSL doesn't reliably reach it. Needs Python 3.11+ (`py --version`).
 
-# synthetic EMG -> IntentFrames on UDP 47800 (what Unreal will consume)
-partialdive calibrate --profile dev-simulated --out data/scratch/cal.yaml --simulate --seconds 3
-partialdive decode --profile dev-simulated --calibration data/scratch/cal.yaml --simulate
+**One-time setup**
+
+```powershell
+cd "C:\Users\<you>\...\full-dive-vr"
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e "services[hardware,lsl,dev]"
+.\.venv\Scripts\python.exe -m pytest services/tests        # expect: 24 passed
 ```
 
-Then: create the Unreal project ([`unreal/README.md`](unreal/README.md)), order the V0 hardware
-([`docs/hardware.md`](docs/hardware.md)), and run experiment [000](experiments/000-loop-latency/).
+(Calling `.venv\Scripts\...` directly means you never need `Activate.ps1`, which PowerShell's execution
+policy often blocks. If you do activate it, drop the `.\.venv\Scripts\` prefix below.)
+
+**Everyday testing: one command + Play**
+
+```powershell
+.\.venv\Scripts\partialdive.exe dev
+```
+
+That starts everything the Unreal project talks to: a simulated EMG decoder (self-calibrating) streaming
+intent on UDP 47800, and the haptic bus on UDP 47801 (dry-run: it prints the actuator commands instead
+of driving hardware). One status line shows intent rate, values, active block and haptics. Ctrl+C stops it.
+
+Then press **Play** in Unreal. The bridge's **debug overlay** (top-left, on by default in the editor)
+shows whether intent is LIVE, every channel, the block code and the last haptic event. Type
+`pdive.debug 0` in the console (` key) to hide it.
+
+When real hardware arrives: `partialdive calibrate --profile v0-forearm --out <file>` once, then
+`partialdive dev --profile v0-forearm --calibration <file>`.
+
+Next: order the V0 hardware ([`docs/hardware.md`](docs/hardware.md)) and run experiment
+[000](experiments/000-loop-latency/).
 
 ## Ground rules
 

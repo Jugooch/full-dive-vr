@@ -32,4 +32,6 @@ pip install -e "services[hardware,lsl,dev]"
 pytest services/tests
 partialdive -h
 ```
-Firmware: PlatformIO (`pio run -t upload` in `firmware/<project>/`). Unreal: UE 5.8, created from the VR template.
+Firmware: PlatformIO (`pio run -t upload` in `firmware/<project>/`).
+Unreal (UE 5.8, project at `unreal/PartialDiveVR/PartialDiveVR/`): build and test commands are in `unreal/README.md`.
+The bridge's C++ JSON contract code is `Plugins/PartialDiveBridge/.../PDBridgeJson.cpp` and is part of the schema-parity rule above.

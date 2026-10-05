@@ -58,7 +58,7 @@ the "Intent Bus" design in [research/03](research/03-diy-research-strategy.md).
 | Voice / chants | `services/src/partialdive/voice/` | Python | V4 placeholder |
 | EMG firmware | [`firmware/emg-streamer/`](../firmware/emg-streamer/) | C++ (Arduino) | v0.1 |
 | Haptics firmware | [`firmware/haptics-controller/`](../firmware/haptics-controller/) | C++ (Arduino) | v0.1 |
-| Unreal project + bridge | [`unreal/`](../unreal/) | UE 5.8 C++/BP | spec; create in editor |
+| Unreal project + bridge | [`unreal/`](../unreal/) | UE 5.8 C++/BP | project created; `PartialDiveBridge` v0.1 + LSL plugin building, unit-tested |
 
 ## Contracts and ports
 
@@ -73,6 +73,9 @@ See [`schemas/README.md`](../schemas/README.md). Summary:
 | game markers | — | `pdive.game` |
 
 ## Session workflow
+
+Everyday development/testing is just `partialdive dev` + Play (overlay: `pdive.debug`). A recorded
+experiment session adds calibration, LabRecorder and blinded blocks:
 
 ```bash
 partialdive session init 002 --profile v0-forearm          # randomized, blinded block codes

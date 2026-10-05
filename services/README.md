@@ -23,6 +23,7 @@ pytest services/tests
 ## CLI
 
 ```text
+partialdive dev [--profile P] [--calibration F] [--simulate] [--dry-run]   # everyday testing: decoder + haptic bus
 partialdive session init <exp> --profile <profile> [--participant P01]
 partialdive session unblind <session_dir>
 partialdive block start <session_dir> <n>
@@ -32,5 +33,6 @@ partialdive haptic-bus --profile <profile> [--session-dir D --block N] [--dry-ru
 partialdive haptic-test <zone> --profile <profile> [--dry-run]
 ```
 
-No hardware yet? `--profile dev-simulated --simulate` runs the whole decode loop with synthetic EMG
-(alternating legs walk, forearm grabs, abdomen gathers) so the Unreal bridge can be built first.
+No hardware yet? `partialdive dev` uses the `dev-simulated` profile: synthetic EMG (alternating legs walk,
+forearm grabs, abdomen gathers), self-calibrating, with dry-run haptics. liblsl's INFO logging is silenced
+via `lsl/lsl_api.cfg` (set `LSLAPICFG` yourself to override).

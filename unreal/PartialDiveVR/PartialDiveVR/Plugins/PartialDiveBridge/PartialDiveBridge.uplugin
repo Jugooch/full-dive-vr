@@ -1,0 +1,31 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1.0",
+	"FriendlyName": "PartialDiveBridge",
+	"Description": "I/O between Unreal and the partialdive Python services: IntentFrame in, HapticEvent out, block/1 control, ChantPhrase, LSL game markers. Contracts: /schemas in the full-dive-vr repo.",
+	"Category": "Other",
+	"CreatedBy": "Justice",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "PartialDiveBridge",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [ "Win64", "Linux" ]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "LabStreamingLayer",
+			"Enabled": true
+		}
+	]
+}

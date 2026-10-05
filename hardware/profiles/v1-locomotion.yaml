@@ -1,6 +1,6 @@
 # V1 — motionless embodiment / locomotion, sensory recliner v1.
 name: v1-locomotion
-headset: Meta Quest 3 (Link, OpenXR)
+headset: Oculus Rift S (PCVR, inside-out tracking, OpenXR via Meta PC app)
 emg:
   device: MyoWare 2.0 x3 (ENV) -> ESP32 emg-streamer
   port: COM4

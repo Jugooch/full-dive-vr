@@ -1,0 +1,3 @@
+[submodule "unreal/PartialDiveVR/PartialDiveVR/Plugins/LSL"]
+	path = unreal/PartialDiveVR/PartialDiveVR/Plugins/LSL
+	url = https://github.com/labstreaminglayer/plugin-UE4.git

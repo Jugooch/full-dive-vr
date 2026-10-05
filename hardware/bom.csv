@@ -1,6 +1,6 @@
 stage,item,qty,unit_price_usd_2026,purpose,source_ref,status
 0,VR-capable PC,1,,Unreal 5.8 + PCVR,,owned?
-0,VR headset (Quest 3-class),1,,visual world via Link/OpenXR,S47;S48,owned?
+0,VR headset (Oculus Rift S),1,,visual world via OpenXR (Meta PC app runtime),S47;S48,owned
 0,Reclining chair,1,,body support,,owned?
 1,ESP32 dev board (HUZZAH32),2,20,EMG streamer + haptics controller,S55,to-buy
 1,DRV2605L haptic driver,4,8,waveform haptics per zone,S54,to-buy

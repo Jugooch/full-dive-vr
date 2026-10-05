@@ -1,6 +1,6 @@
 # V2+ — synthetic physiology: mana core (abdomen) routed to the right hand.
 name: v2-mana
-headset: Meta Quest 3 (Link, OpenXR)
+headset: Oculus Rift S (PCVR, inside-out tracking, OpenXR via Meta PC app)
 emg:
   device: MyoWare 2.0 x2 (ENV) -> ESP32 emg-streamer
   port: COM4

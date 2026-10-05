@@ -35,6 +35,8 @@ unreal/**/Intermediate/
 unreal/**/Saved/
 unreal/**/.vs/
 unreal/**/*.sln
+unreal/**/*.slnx
+unreal/**/.github/copilot-instructions.md
 unreal/**/*.VC.db
 unreal/**/*.opensdf
 unreal/**/*.sdf

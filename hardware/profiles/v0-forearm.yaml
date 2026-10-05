@@ -1,6 +1,6 @@
 # V0 — prove the intent loop: forearm flex -> virtual hand closes -> haptic response.
 name: v0-forearm
-headset: Meta Quest 3 (Link, OpenXR)
+headset: Oculus Rift S (PCVR, inside-out tracking, OpenXR via Meta PC app)
 emg:
   device: MyoWare 2.0 (ENV output) -> ESP32 emg-streamer
   port: COM4            # edit per machine

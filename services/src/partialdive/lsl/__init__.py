@@ -8,7 +8,12 @@ on a machine without it; in that case timestamps fall back to a monotonic clock 
 from __future__ import annotations
 
 import json
+import os
 import time
+from pathlib import Path
+
+# Quiet liblsl's INFO logging (network interface dumps) unless the user configured LSL themselves.
+os.environ.setdefault("LSLAPICFG", str(Path(__file__).with_name("lsl_api.cfg")))
 
 try:  # pragma: no cover - depends on optional install
     import pylsl

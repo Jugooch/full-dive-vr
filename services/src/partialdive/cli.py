@@ -17,12 +17,13 @@ def _profile(name: str) -> dict:
     return yaml.safe_load((hardware_profiles_dir() / f"{name}.yaml").read_text())
 
 
-def _emg_source(profile: dict, simulate: bool):
+def _emg_source(profile: dict, simulate: bool, active=None):
     from .biosignal import SerialEMGSource, SimulatedEMGSource
 
     names = [c["name"] for c in profile["emg"]["channels"]]
     if simulate:
-        return names, SimulatedEMGSource(len(names), rate_hz=profile["emg"].get("sample_rate_hz", 500), realtime=True)
+        rate = profile["emg"].get("sample_rate_hz", 500)
+        return names, SimulatedEMGSource(len(names), rate_hz=rate, active=active, realtime=True)
     return names, SerialEMGSource(profile["emg"]["port"], len(names))
 
 
@@ -85,7 +86,9 @@ def cmd_calibrate(a) -> None:
     from .intent.threshold import RestCalibration
 
     profile = _profile(a.profile)
-    names, source = _emg_source(profile, a.simulate)
+    # Simulated muscles follow the prompts: silent during rest, only the prompted channel during contraction.
+    phase = {"active_channel": None}
+    names, source = _emg_source(profile, a.simulate, active=lambda ch, t: ch == phase["active_channel"])
     it = iter(source)
     input(f"RELAX completely for {a.seconds:.0f} s. Press Enter to start...")
     rest = _collect(it, a.seconds)
@@ -93,38 +96,155 @@ def cmd_calibrate(a) -> None:
     for i, name in enumerate(names):
         input(f"Comfortable deliberate contraction of [{name}] for {a.seconds:.0f} s "
               "(not maximal effort). Press Enter...")
+        phase["active_channel"] = i
         active = _collect(it, a.seconds)
+        phase["active_channel"] = None
         cal.channels[name] = RestCalibration.fit(rest[:, i], active[:, i])
-    Path(a.out).write_text(yaml.safe_dump(cal.to_dict(), sort_keys=False))
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(yaml.safe_dump(cal.to_dict(), sort_keys=False))
     print(f"wrote {a.out}")
 
 
 # ---------------------------------------------------------------- decode loop
-def cmd_decode(a) -> None:
-    from .intent.decoder import Calibration, EmgIntentDecoder
+def _decode_loop(profile: dict, cal, source, names: list[str], port: int, rate: float, stop=None, on_frame=None):
+    """EMG samples -> IntentFrame -> UDP (Unreal) + LSL. Runs until `stop` is set or Ctrl+C."""
+    from .intent.decoder import EmgIntentDecoder
     from .lsl import MarkerOutlet, SignalOutlet
     from .net import UdpJsonSender
+
+    decoder = EmgIntentDecoder(names, profile["intent_mapping"], cal)
+    udp = UdpJsonSender(port=port)
+    raw_out = SignalOutlet("pdive.emg", "EMG", names, profile["emg"].get("sample_rate_hz", 500))
+    intent_out = MarkerOutlet("pdive.intent")
+    period, last_sent = 1.0 / rate, 0.0
+    for s in source:
+        if stop is not None and stop.is_set():
+            break
+        raw_out.push(s.values, s.timestamp)
+        frame = decoder.decode(s.timestamp, s.values)
+        if s.timestamp - last_sent >= period:
+            payload = frame.to_json()
+            udp.send(payload)
+            intent_out.push(payload.decode(), s.timestamp)
+            last_sent = s.timestamp
+            if on_frame:
+                on_frame(frame)
+
+
+def cmd_decode(a) -> None:
+    from .intent.decoder import Calibration
 
     profile = _profile(a.profile)
     names, source = _emg_source(profile, a.simulate)
     cal = Calibration.from_dict(yaml.safe_load(Path(a.calibration).read_text()))
-    decoder = EmgIntentDecoder(names, profile["intent_mapping"], cal)
-    udp = UdpJsonSender(port=a.port)
-    raw_out = SignalOutlet("pdive.emg", "EMG", names, profile["emg"].get("sample_rate_hz", 500))
-    intent_out = MarkerOutlet("pdive.intent")
-    period, last_sent = 1.0 / a.rate, 0.0
     print(f"decoding {names} -> udp:{a.port} at {a.rate} Hz (Ctrl+C to stop)")
     try:
-        for s in source:
-            raw_out.push(s.values, s.timestamp)
-            frame = decoder.decode(s.timestamp, s.values)
-            if s.timestamp - last_sent >= period:
-                payload = frame.to_json()
-                udp.send(payload)
-                intent_out.push(payload.decode(), s.timestamp)
-                last_sent = s.timestamp
+        _decode_loop(profile, cal, source, names, a.port, a.rate)
     except KeyboardInterrupt:
         pass
+
+
+def _simulated_calibration(profile: dict, seconds: float = 1.0):
+    """Non-interactive calibration against the simulator (rest, then each channel alone)."""
+    from .biosignal import SimulatedEMGSource
+    from .intent.decoder import Calibration
+    from .intent.threshold import RestCalibration
+
+    names = [c["name"] for c in profile["emg"]["channels"]]
+    phase = {"ch": None}
+    rate = profile["emg"].get("sample_rate_hz", 500)
+    it = iter(SimulatedEMGSource(len(names), rate_hz=rate, active=lambda ch, t: ch == phase["ch"]))
+    n = int(seconds * rate)
+    rest = np.asarray([next(it).values for _ in range(n)])
+    cal = Calibration()
+    for i, name in enumerate(names):
+        phase["ch"] = i
+        active = np.asarray([next(it).values for _ in range(n)])
+        cal.channels[name] = RestCalibration.fit(rest[:, i], active[:, i])
+    return cal
+
+
+def cmd_dev(a) -> None:
+    """Everything needed to press Play in Unreal: intent decoder + haptic bus in one process."""
+    import threading
+
+    from .contracts import HapticEvent
+    from .haptics import HapticCondition
+    from .intent.decoder import Calibration
+    from .lsl import local_clock
+    from .net import DEFAULT_PORTS, UdpJsonReceiver
+
+    profile = _profile(a.profile)
+    simulate = a.simulate or profile["emg"].get("device") == "simulated"
+    names, source = _emg_source(profile, simulate)
+    if a.calibration:
+        cal = Calibration.from_dict(yaml.safe_load(Path(a.calibration).read_text()))
+    elif simulate:
+        cal = _simulated_calibration(profile)
+    else:
+        sys.exit("real sensors need a calibration: run `partialdive calibrate --profile "
+                 f"{a.profile} --out <file>` first, then pass --calibration <file>")
+
+    dry_run = a.dry_run or not profile.get("haptics", {}).get("port")
+    bus, transport = _haptic_bus(profile, dry_run)
+    stop = threading.Event()
+    stats = {"frames": 0, "last": None, "haptics": 0, "last_line": "", "block": "-"}
+
+    def haptic_loop() -> None:
+        rx = UdpJsonReceiver(DEFAULT_PORTS["haptic"])
+        while not stop.is_set():
+            now = local_clock()
+            for msg in rx.poll():
+                if msg.get("schema") == "block/1":
+                    bus.set_condition(HapticCondition.from_params(msg.get("params")))
+                    stats["block"] = f"{msg.get('block')} [{msg.get('code')}]"
+                    continue
+                try:
+                    bus.handle(HapticEvent.from_dict(msg), now)
+                except (ValueError, TypeError) as e:
+                    print(f"\nrejected haptic event: {e}", file=sys.stderr)
+            sent = bus.tick(now)
+            if sent:
+                stats["haptics"] += sent
+                stats["last_line"] = transport.lines[-1] if hasattr(transport, "lines") and transport.lines else "sent"
+            time.sleep(0.0005)
+        rx.close()
+
+    def on_frame(frame) -> None:
+        stats["frames"] += 1
+        stats["last"] = frame
+
+    def status_loop() -> None:
+        last_n, last_t = 0, time.monotonic()
+        while not stop.wait(0.5):
+            n, t = stats["frames"], time.monotonic()
+            hz = (n - last_n) / (t - last_t)
+            last_n, last_t = n, t
+            f = stats["last"]
+            body = (f"walk {f.walk_forward:.2f} stepL {f.step_left:.0f} stepR {f.step_right:.0f} "
+                    f"grabR {f.grab_right:.0f} core {f.core_activation:.2f}") if f else "no frames yet"
+            hap = f"haptics {stats['haptics']}" + (f" (last: {stats['last_line']})" if stats["last_line"] else "")
+            print(f"\rintent {hz:5.0f} Hz | {body} | block {stats['block']} | {hap}    ", end="", flush=True)
+
+    mode = "SIMULATED sensors" if simulate else f"sensors on {profile['emg'].get('port')}"
+    hmode = "dry-run (printed, no hardware)" if dry_run else f"actuators on {profile['haptics']['port']}"
+    print(f"partialdive dev | profile {a.profile} | {mode} | haptics {hmode}")
+    print(f"intent -> udp:{DEFAULT_PORTS['intent']}   haptic events <- udp:{DEFAULT_PORTS['haptic']}   "
+          "Press Play in Unreal. Ctrl+C to stop.")
+    threads = [threading.Thread(target=haptic_loop, daemon=True), threading.Thread(target=status_loop, daemon=True)]
+    for th in threads:
+        th.start()
+    try:
+        _decode_loop(profile, cal, source, names, DEFAULT_PORTS["intent"], a.rate, stop, on_frame)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stop.set()
+        for th in threads:
+            th.join(timeout=1)
+        transport.close()
+        print("\nstopped")
 
 
 # ---------------------------------------------------------------- haptics
@@ -223,6 +343,14 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--port", type=int, default=47800)
     d.add_argument("--simulate", action="store_true")
     d.set_defaults(fn=cmd_decode)
+
+    dv = sub.add_parser("dev", help="one command for testing: intent decoder + haptic bus (simulated by default)")
+    dv.add_argument("--profile", default="dev-simulated")
+    dv.add_argument("--calibration", help="needed for real sensors; simulated profiles self-calibrate")
+    dv.add_argument("--simulate", action="store_true", help="simulate EMG even if the profile has real sensors")
+    dv.add_argument("--dry-run", action="store_true", help="print haptic commands instead of driving hardware")
+    dv.add_argument("--rate", type=float, default=100.0)
+    dv.set_defaults(fn=cmd_dev)
 
     hb = sub.add_parser("haptic-bus", help="Unreal HapticEvents -> condition -> actuators")
     hb.add_argument("--profile", required=True)

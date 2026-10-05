@@ -13,7 +13,7 @@ before buying. `[S#]` refers to [research/sources.md](research/sources.md). The 
 | Item | Why | Approx. | Ref |
 |---|---|---|---|
 | VR-capable PC | Unreal 5.8 + PCVR | owned | — |
-| VR headset, Quest 3-class | Visual world; Link + OpenXR. If you already own decent PCVR, use it; don't upgrade yet | owned / Quest 3 | [S47, S48] |
+| VR headset: **Oculus Rift S** (owned) | Visual world via OpenXR (Meta PC app as runtime). The research says use the PCVR headset you have; a Quest 3 is *not* required. Inside-out tracking (no external sensors), built-in mic for V4, Touch controllers for baselines | owned | [S47, S48] |
 | Comfortable reclining chair | Body support; experiments are reclined | used / owned | — |
 | MyoWare 2.0 Muscle Sensor ×1 | Intent sensing. Raw, rectified **and envelope** outputs, adjustable gain | ~$43 | [S31, S57] |
 | MyoWare 2.0 Power Shield | Battery power: biosignal electronics stay isolated | ~$16 | [S59] |
