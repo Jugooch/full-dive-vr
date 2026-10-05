@@ -1,0 +1,28 @@
+# V1 — motionless embodiment / locomotion, sensory recliner v1.
+name: v1-locomotion
+headset: Meta Quest 3 (Link, OpenXR)
+emg:
+  device: MyoWare 2.0 x3 (ENV) -> ESP32 emg-streamer
+  port: COM4
+  sample_rate_hz: 1000
+  channels:
+    - {index: 0, name: right_forearm, placement: "forearm flexor group"}
+    - {index: 1, name: left_quad, placement: "per MyoWare guide, quadriceps"}
+    - {index: 2, name: right_quad, placement: "per MyoWare guide, quadriceps"}
+intent_mapping:
+  grab_right: {mode: binary, channel: right_forearm, k: 4.0}
+  walk_forward: {mode: cadence, left: left_quad, right: right_quad, k: 4.0, speed_k: 0.5}
+haptics:
+  device: ESP32 haptics-controller + DRV2605L x8 via TCA9548A; Dayton BST-1 on audio amp; 3 fans
+  port: COM5
+  zones:
+    left_shoulder: 0
+    right_shoulder: 1
+    left_forearm: 2
+    right_forearm: 3
+    left_torso: 4
+    right_torso: 5
+    left_thigh: 6
+    right_thigh: 7
+  fans: {air_front: 0, air_left: 1, air_right: 2}
+  bass_shaker: "driven as audio from Unreal (separate audio device), not via serial"

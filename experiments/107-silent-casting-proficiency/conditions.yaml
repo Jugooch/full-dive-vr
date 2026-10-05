@@ -1,0 +1,16 @@
+experiment: 107-silent-casting-proficiency
+version: V5
+blinded: true
+randomize: true
+repetitions: 10
+conditions:
+  - id: FULL
+    label: full chant, full guidance
+    params: {chant: structured_full, mana_haptics: full, visual_guidance: high}
+  - id: SHORT
+    label: shortened chant
+    params: {chant: structured_short, mana_haptics: full, visual_guidance: medium}
+  - id: SILENT
+    label: silent casting
+    params: {chant: none, mana_haptics: reduced, visual_guidance: minimal}
+measures: [casting-experience, mana-sensation]

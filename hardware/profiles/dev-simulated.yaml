@@ -1,0 +1,20 @@
+name: dev-simulated
+headset: none
+emg:
+  device: simulated
+  port: null
+  sample_rate_hz: 500
+  channels:
+    - {index: 0, name: right_forearm}
+    - {index: 1, name: left_quad}
+    - {index: 2, name: right_quad}
+    - {index: 3, name: abdomen}
+intent_mapping:
+  grab_right: {mode: binary, channel: right_forearm, k: 4.0}
+  walk_forward: {mode: cadence, left: left_quad, right: right_quad, k: 4.0, speed_k: 0.5}
+  core_activation: {mode: continuous, channel: abdomen, alpha: 0.2}
+haptics:
+  device: dry-run
+  port: null
+  zones: {right_forearm: 0, left_forearm: 1, chest: 2, right_shoulder: 3, core: 4, right_upper_arm: 5, right_hand: 6}
+  fans: {air_front: 0}

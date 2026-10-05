@@ -1,0 +1,16 @@
+experiment: 105-mana-control-language
+version: V3
+blinded: false
+randomize: true
+repetitions: 10
+conditions:
+  - id: A
+    label: neutral projectile
+    params: {school: neutral, composition: [GATHER, ROUTE_RIGHT, PROJECTILE]}
+  - id: B
+    label: fire projectile
+    params: {school: fire, composition: [GATHER, ROUTE_RIGHT, PROJECTILE]}
+  - id: C
+    label: water barrier
+    params: {school: water, composition: [GATHER, ROUTE_BOTH, EXPAND]}
+measures: [casting-experience, mana-sensation]

@@ -1,0 +1,19 @@
+experiment: 013-multimodal-intent-fusion
+version: EEG
+blinded: true
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: EMG only
+    params: {intent_sources: [emg], trials: 20}
+  - id: B
+    label: EMG + gaze + context
+    params: {intent_sources: [emg, gaze, context], trials: 20}
+  - id: C
+    label: EEG + EMG + gaze + context
+    params: {intent_sources: [eeg, emg, gaze, context], trials: 20}
+  - id: D
+    label: EEG + gaze + context
+    params: {intent_sources: [eeg, gaze, context], trials: 20}
+measures: [veq, intent-control]

@@ -1,0 +1,10 @@
+experiment: <id>-<slug>
+version: <V0..V6 | EEG>
+blinded: true            # randomizer hides order from participant display
+randomize: true
+repetitions: 1           # per condition per session
+conditions:
+  - id: A
+    label: <short label>
+    params: {}
+measures: []             # instrument ids: veq, ssq, ipq, mana-sensation, intent-control, casting-experience

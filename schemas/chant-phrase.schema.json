@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jugooch/full-dive-vr/schemas/chant-phrase.schema.json",
+  "title": "ChantPhrase",
+  "description": "A recognized incantation phrase (V4). The voice service does VAD + local recognition + phrase alignment; Unreal's spell state machine never sees raw audio.",
+  "type": "object",
+  "required": ["schema", "timestamp", "spell", "phase", "confidence"],
+  "properties": {
+    "schema": { "const": "chant-phrase/1" },
+    "timestamp": { "type": "number", "description": "LSL clock seconds at phrase end." },
+    "spell": { "type": "string", "description": "Spell id from the chant grammar, e.g. FIRE_LANCE." },
+    "phrase_index": { "type": "integer", "minimum": 0 },
+    "phase": { "type": "string", "enum": ["SENSE", "GATHER", "ROUTE", "SHAPE", "CHARGE", "RELEASE"] },
+    "text": { "type": "string", "description": "Recognized text (for logging only; never drives logic)." },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "Recognition confidence. Keep pronunciation forgiving." },
+    "timing_error_ms": { "type": "number", "description": "Deviation from the expected cadence for this phrase." },
+    "cadence_stability": { "type": "number", "minimum": 0, "maximum": 1, "description": "Optional: pacing/continuity/breath stability score." }
+  },
+  "additionalProperties": false
+}

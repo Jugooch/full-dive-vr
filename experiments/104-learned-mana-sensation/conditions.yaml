@@ -1,0 +1,16 @@
+experiment: 104-learned-mana-sensation
+version: V2.5
+blinded: true
+randomize: full          # each block = one cast; fully shuffled so catch trials are unpredictable
+repetitions: 10          # casts per condition per probe session (30 total)
+conditions:
+  - id: F
+    label: full haptics
+    params: {mana_haptics: full, visual_flow: true}
+  - id: R
+    label: reduced haptics
+    params: {mana_haptics: reduced, reduced_zones: [core], amplitude_scale: 0.5, visual_flow: true}
+  - id: V
+    label: visual only
+    params: {mana_haptics: none, visual_flow: true}
+measures: [mana-sensation]

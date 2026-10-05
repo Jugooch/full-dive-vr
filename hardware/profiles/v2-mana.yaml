@@ -1,0 +1,21 @@
+# V2+ — synthetic physiology: mana core (abdomen) routed to the right hand.
+name: v2-mana
+headset: Meta Quest 3 (Link, OpenXR)
+emg:
+  device: MyoWare 2.0 x2 (ENV) -> ESP32 emg-streamer
+  port: COM4
+  sample_rate_hz: 1000
+  channels:
+    - {index: 0, name: abdomen, placement: "abdominal wall, per MyoWare guide"}
+    - {index: 1, name: right_forearm, placement: "forearm flexor group"}
+respiration:
+  device: null          # optional stretch sensor; never require breath-holding
+intent_mapping:
+  core_activation: {mode: continuous, channel: abdomen, alpha: 0.15}
+  route_right: {mode: continuous, channel: right_forearm, alpha: 0.2}
+  release: {mode: binary, channel: right_forearm, k: 6.0}
+haptics:
+  device: ESP32 haptics-controller + DRV2605L x6 via TCA9548A
+  port: COM5
+  # core -> chest -> shoulder -> upper arm -> forearm -> hand (flow path)
+  zones: {core: 0, chest: 1, right_shoulder: 2, right_upper_arm: 3, right_forearm: 4, right_hand: 5}

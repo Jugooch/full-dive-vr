@@ -1,0 +1,19 @@
+experiment: 008-sensory-ablation
+version: V1
+blinded: false           # modalities are perceptible by design
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: VR + audio
+    params: {modalities: []}
+  - id: B
+    label: + localized haptics
+    params: {modalities: [vibration]}
+  - id: C
+    label: + chair vibration
+    params: {modalities: [vibration, bass_shaker]}
+  - id: D
+    label: + airflow
+    params: {modalities: [vibration, bass_shaker, airflow]}
+measures: [veq, ipq, ssq]

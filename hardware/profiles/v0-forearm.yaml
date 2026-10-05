@@ -1,0 +1,16 @@
+# V0 — prove the intent loop: forearm flex -> virtual hand closes -> haptic response.
+name: v0-forearm
+headset: Meta Quest 3 (Link, OpenXR)
+emg:
+  device: MyoWare 2.0 (ENV output) -> ESP32 emg-streamer
+  port: COM4            # edit per machine
+  sample_rate_hz: 1000
+  channels:
+    - {index: 0, name: right_forearm, placement: "forearm flexor group, per MyoWare 2.0 placement guide"}
+intent_mapping:
+  grab_right: {mode: binary, channel: right_forearm, k: 4.0}
+  action_strength: {mode: continuous, channel: right_forearm, alpha: 0.3}
+haptics:
+  device: ESP32 haptics-controller + DRV2605L x4 via TCA9548A
+  port: COM5            # edit per machine
+  zones: {right_forearm: 0, left_forearm: 1, chest: 2, right_shoulder: 3}

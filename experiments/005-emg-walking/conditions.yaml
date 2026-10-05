@@ -1,0 +1,13 @@
+experiment: 005-emg-walking
+version: V1
+blinded: false
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: cadence to speed
+    params: {locomotion: emg, speed_mode: cadence, speed_gain_k: 0.7}
+  - id: B
+    label: cadence to fixed speed
+    params: {locomotion: emg, speed_mode: binary, fixed_speed_mps: 1.2}
+measures: [intent-control, ssq, veq]

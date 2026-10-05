@@ -1,0 +1,25 @@
+experiment: 102-tactile-flow-illusion
+version: V2
+blinded: true
+randomize: true
+repetitions: 2
+conditions:
+  - id: A
+    label: 6 actuators + visual
+    params: {actuators: [core, chest, right_shoulder, right_upper_arm, right_forearm, right_hand], visual_flow: true, flows: 10}
+  - id: B
+    label: 6 actuators, no visual
+    params: {actuators: [core, chest, right_shoulder, right_upper_arm, right_forearm, right_hand], visual_flow: false, flows: 10}
+  - id: C
+    label: 3 actuators + visual
+    params: {actuators: [core, right_shoulder, right_hand], visual_flow: true, flows: 10}
+  - id: D
+    label: 2 actuators + visual
+    params: {actuators: [core, right_forearm], visual_flow: true, flows: 10}
+  - id: E
+    label: 2 actuators, no visual
+    params: {actuators: [core, right_forearm], visual_flow: false, flows: 10}
+  - id: F
+    label: visual only
+    params: {actuators: [], visual_flow: true, flows: 10}
+measures: [mana-sensation]

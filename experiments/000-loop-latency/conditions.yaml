@@ -1,0 +1,13 @@
+experiment: 000-loop-latency
+version: V0
+blinded: false
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: EMG to hand to haptic
+    params: {input: emg, haptics_enabled: true, trials: 50, min_interval_s: 3}
+  - id: B
+    label: keyboard reference
+    params: {input: keyboard, haptics_enabled: true, trials: 50, min_interval_s: 3}
+measures: []

@@ -1,0 +1,22 @@
+experiment: 002-synchronized-touch
+version: V0
+blinded: true
+randomize: true
+repetitions: 3
+conditions:
+  - id: A
+    label: immediate congruent
+    params: {haptic_delay_ms: 0, haptic_zone_remap: null, haptics_enabled: true}
+  - id: B
+    label: 150 ms delayed congruent
+    params: {haptic_delay_ms: 150, haptic_zone_remap: null, haptics_enabled: true}
+  - id: C
+    label: over 300 ms delayed congruent
+    params: {haptic_delay_ms: 350, haptic_zone_remap: null, haptics_enabled: true}
+  - id: D
+    label: immediate wrong arm
+    params: {haptic_delay_ms: 0, haptic_zone_remap: {right_forearm: left_forearm}, haptics_enabled: true}
+  - id: E
+    label: no physical feedback
+    params: {haptic_delay_ms: 0, haptic_zone_remap: null, haptics_enabled: false}
+measures: [veq]

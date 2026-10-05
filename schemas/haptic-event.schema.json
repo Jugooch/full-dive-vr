@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jugooch/full-dive-vr/schemas/haptic-event.schema.json",
+  "title": "HapticEvent",
+  "description": "A request from the virtual world for physical feedback. Unreal emits these; the haptic bus applies the experiment condition (delay, remap, drop) and drives hardware. Unreal never talks to actuators directly.",
+  "type": "object",
+  "required": ["schema", "id", "timestamp", "kind", "zone", "strength"],
+  "properties": {
+    "schema": { "const": "haptic-event/1" },
+    "id": { "type": "integer", "minimum": 0, "description": "Unique per run, so latency can be measured end to end." },
+    "timestamp": { "type": "number", "description": "LSL clock seconds when the virtual event occurred (e.g. collision)." },
+    "kind": {
+      "type": "string",
+      "enum": ["contact", "impact", "pulse", "flow", "rumble", "airflow", "stop_all"],
+      "description": "contact/impact = localized touch; pulse = repeating (mana core); flow = traveling sequence; rumble = bass shaker; airflow = fans."
+    },
+    "zone": {
+      "type": "string",
+      "enum": [
+        "core", "chest", "upper_back",
+        "left_shoulder", "right_shoulder",
+        "left_upper_arm", "right_upper_arm",
+        "left_forearm", "right_forearm",
+        "left_hand", "right_hand",
+        "left_torso", "right_torso",
+        "left_thigh", "right_thigh",
+        "left_foot", "right_foot",
+        "seat", "air_front", "air_left", "air_right", "air_overhead", "all"
+      ]
+    },
+    "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+    "duration_ms": { "type": "integer", "minimum": 0, "maximum": 10000, "default": 120 },
+    "pattern": { "type": "string", "description": "Named waveform/pattern, e.g. 'click', 'buzz', 'heartbeat', or a DRV2605L effect name." },
+    "path": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "For kind=flow: ordered zones the sensation travels through, e.g. [core, chest, right_shoulder, right_forearm, right_hand]."
+    },
+    "step_ms": { "type": "integer", "minimum": 1, "description": "For kind=flow: onset spacing between successive zones." },
+    "source": { "type": "string", "description": "What caused it (e.g. 'collision:sword/dummy', 'mana:route')." }
+  },
+  "additionalProperties": false
+}

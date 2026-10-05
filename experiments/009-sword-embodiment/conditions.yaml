@@ -1,0 +1,16 @@
+experiment: 009-sword-embodiment
+version: V1
+blinded: false
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: intent + full impact feedback
+    params: {input: emg, gaze_targeting: true, impact_feedback: [haptic, bass_shaker, audio], trials: 20}
+  - id: B
+    label: intent + audio only
+    params: {input: emg, gaze_targeting: true, impact_feedback: [audio], trials: 20}
+  - id: C
+    label: controller + full feedback
+    params: {input: controllers, gaze_targeting: false, impact_feedback: [haptic, bass_shaker, audio], trials: 20}
+measures: [veq, intent-control]

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jugooch/full-dive-vr/schemas/block.schema.json",
+  "title": "BlockStart",
+  "description": "Sent by `partialdive block start` to Unreal (UDP 47803) and the haptic bus (UDP 47801) at the start of each condition block, and recorded as an LSL marker on `pdive.experiment`. Carries the unblinded params so the runtime can apply them; participant-facing UI must only ever display `code`.",
+  "type": "object",
+  "required": ["schema", "timestamp", "session_id", "block", "code", "params"],
+  "properties": {
+    "schema": { "const": "block/1" },
+    "timestamp": { "type": "number" },
+    "session_id": { "type": "string" },
+    "experiment": { "type": "string" },
+    "block": { "type": "integer", "minimum": 1 },
+    "code": { "type": "string" },
+    "params": { "type": "object", "description": "The condition params from experiments/<id>/conditions.yaml." }
+  },
+  "additionalProperties": false
+}

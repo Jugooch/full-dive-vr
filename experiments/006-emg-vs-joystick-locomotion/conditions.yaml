@@ -1,0 +1,13 @@
+experiment: 006-emg-vs-joystick-locomotion
+version: V1
+blinded: false           # input method is inherently known to the participant
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: joystick locomotion
+    params: {locomotion: joystick, course: fixed_v1, scored_runs: 5}
+  - id: B
+    label: EMG locomotion
+    params: {locomotion: emg, course: fixed_v1, scored_runs: 5}
+measures: [veq, ssq, intent-control]

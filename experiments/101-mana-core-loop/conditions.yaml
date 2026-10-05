@@ -1,0 +1,10 @@
+experiment: 101-mana-core-loop
+version: V2
+blinded: false
+randomize: false
+repetitions: 20          # casts per session
+conditions:
+  - id: A
+    label: full sense-gather-route-release loop
+    params: {mana_haptics: full, visual_flow: true, route: [core, chest, shoulder_r, forearm_r, hand_r], gather_gain_k: 1.0, breathing_sync: optional}
+measures: [mana-sensation, casting-experience, veq]

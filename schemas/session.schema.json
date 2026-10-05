@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jugooch/full-dive-vr/schemas/session.schema.json",
+  "title": "Session",
+  "description": "Metadata saved automatically for every experiment session (data/sessions/<experiment>/<date>_sNN/session.yaml), so 'version 14 felt really good' is always traceable to exact hardware, code and condition.",
+  "type": "object",
+  "required": ["schema", "session_id", "experiment", "created", "software", "hardware", "blocks"],
+  "properties": {
+    "schema": { "const": "session/1" },
+    "session_id": { "type": "string", "pattern": "^[0-9]{3}-[a-z0-9-]+_[0-9]{4}-[0-9]{2}-[0-9]{2}_s[0-9]{2}$" },
+    "experiment": { "type": "string" },
+    "version": { "type": "string", "description": "Roadmap version, e.g. V0, V2.5." },
+    "participant": { "type": "string", "default": "P01" },
+    "created": { "type": "string", "format": "date-time" },
+    "software": {
+      "type": "object",
+      "properties": {
+        "repo_commit": { "type": "string" },
+        "repo_dirty": { "type": "boolean" },
+        "unreal_build": { "type": ["string", "null"] },
+        "firmware": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "required": ["repo_commit", "repo_dirty"]
+    },
+    "hardware": {
+      "type": "object",
+      "properties": {
+        "profile": { "type": "string", "description": "hardware/profiles/<name>.yaml used." },
+        "headset": { "type": "string" },
+        "emg": { "type": ["string", "null"] },
+        "eeg": { "type": ["string", "null"] },
+        "haptics": { "type": ["string", "null"] }
+      },
+      "required": ["profile"]
+    },
+    "seed_hash": { "type": "string", "description": "SHA-256 of the randomization seed. The seed itself is stored in the sealed file until unblinding." },
+    "blocks": {
+      "type": "array",
+      "description": "Condition blocks in run order. While blinded, condition ids are replaced by opaque block codes.",
+      "items": {
+        "type": "object",
+        "required": ["block", "code"],
+        "properties": {
+          "block": { "type": "integer", "minimum": 1 },
+          "code": { "type": "string" },
+          "condition_id": { "type": ["string", "null"] },
+          "params": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "metrics": { "type": "object", "description": "Filled after the session (completion_time_ms, false_activations, classification_accuracy, mean_latency_ms, ...)." },
+    "questionnaires": { "type": "object", "description": "Per-block questionnaire scores (veq_ownership, veq_agency, veq_change, ...)." },
+    "notes": { "type": "string" }
+  }
+}

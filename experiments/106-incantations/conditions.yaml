@@ -1,0 +1,16 @@
+experiment: 106-incantations
+version: V4
+blinded: false
+randomize: true
+repetitions: 10
+conditions:
+  - id: A
+    label: no speech
+    params: {chant: none, school: fire, composition: [GATHER, ROUTE_RIGHT, PROJECTILE]}
+  - id: B
+    label: arbitrary phrase
+    params: {chant: arbitrary, school: fire, composition: [GATHER, ROUTE_RIGHT, PROJECTILE]}
+  - id: C
+    label: structured chant
+    params: {chant: structured, phrase_stage_map: [gather, route, shape, release], school: fire, composition: [GATHER, ROUTE_RIGHT, PROJECTILE]}
+measures: [casting-experience, mana-sensation]

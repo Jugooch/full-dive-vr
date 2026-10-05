@@ -1,0 +1,10 @@
+experiment: 001-baseline-embodiment
+version: V0
+blinded: false
+randomize: false
+repetitions: 1
+conditions:
+  - id: A
+    label: baseline full-body avatar
+    params: {avatar: full_body, input: controllers, posture: reclined, mirror: true, duration_min: 8}
+measures: [veq]

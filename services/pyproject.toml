@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "partialdive"
+version = "0.1.0"
+description = "Signal, intent, haptics and experiment tooling for the full-dive-vr partial-dive research platform"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+# Hardware I/O (V0+): ESP32 EMG streamer + haptics controller over USB serial
+hardware = ["pyserial>=3.5"]
+# Lab Streaming Layer timestamps + recording (adopt immediately, per research)
+lsl = ["pylsl>=1.16"]
+# Classifiers (Phase 2B+): scikit-learn first, PyTorch only when data justifies it
+ml = ["scikit-learn>=1.4"]
+# EEG track (Phases 5-6): BrainFlow board API + MNE (CSP, filtering)
+eeg = ["brainflow>=5.12", "mne>=1.7"]
+# Offline analysis of XDF recordings
+analysis = ["pyxdf>=1.16", "pandas>=2.2", "scipy>=1.12", "matplotlib>=3.8"]
+# Voice / incantations (V4): pick one engine when V4 starts, see docs/decisions
+voice = []
+dev = ["pytest>=8", "ruff>=0.5"]
+all = ["partialdive[hardware,lsl,ml,eeg,analysis,dev]"]
+
+[project.scripts]
+partialdive = "partialdive.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

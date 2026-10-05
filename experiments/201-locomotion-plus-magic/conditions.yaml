@@ -1,0 +1,16 @@
+experiment: 201-locomotion-plus-magic
+version: V6
+blinded: false
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: locomotion only
+    params: {locomotion: emg, magic: false, duration_min: 5}
+  - id: B
+    label: magic only
+    params: {locomotion: none, magic: true, chant: optional, duration_min: 5}
+  - id: C
+    label: integrated
+    params: {locomotion: emg, magic: true, chant: optional, duration_min: 5}
+measures: [veq, ipq, ssq, casting-experience]

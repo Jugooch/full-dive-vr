@@ -1,0 +1,13 @@
+experiment: 011-eeg-motor-imagery
+version: EEG
+blinded: false
+randomize: true
+repetitions: 30          # trials per class per run (20-40 recommended)
+conditions:
+  - id: L
+    label: left hand imagery
+    params: {task: imagine_left_hand, rest_s: 2, imagery_s: 4, pipeline: csp_lda, band_hz: [8, 31]}
+  - id: R
+    label: right hand imagery
+    params: {task: imagine_right_hand, rest_s: 2, imagery_s: 4, pipeline: csp_lda, band_hz: [8, 31]}
+measures: []

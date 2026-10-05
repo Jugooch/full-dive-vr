@@ -1,0 +1,19 @@
+experiment: 007-minimal-activation
+version: V1
+blinded: false
+randomize: false         # training progression, ordered by difficulty
+repetitions: 1
+conditions:
+  - id: A
+    label: reference contraction
+    params: {locomotion: emg, activation_target: 1.0}
+  - id: B
+    label: reduced
+    params: {locomotion: emg, activation_target: 0.5}
+  - id: C
+    label: subtle
+    params: {locomotion: emg, activation_target: 0.25}
+  - id: D
+    label: minimal
+    params: {locomotion: emg, activation_target: 0.1}
+measures: [veq, intent-control]

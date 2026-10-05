@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jugooch/full-dive-vr/schemas/mana-spell.schema.json",
+  "title": "ManaSpell",
+  "description": "A spell as constructed by the casting state machine (V3+). Logged on every release so casting quality can be analysed. Q = w_m*M + w_v*V + w_c*C + w_f*F.",
+  "type": "object",
+  "required": ["schema", "timestamp", "element", "form", "magnitude", "outcome"],
+  "properties": {
+    "schema": { "const": "mana-spell/1" },
+    "timestamp": { "type": "number" },
+    "element": { "type": "string", "enum": ["NEUTRAL", "FIRE", "WATER", "EARTH", "WIND", "HEALING", "ICE", "LIGHTNING"] },
+    "form": { "type": "string", "enum": ["PROJECTILE", "BARRIER", "STREAM", "EXPAND", "ORB", "LANCE"] },
+    "behavior": { "type": "string", "description": "e.g. COMPRESSED, ROTATE, SURROUND." },
+    "route": { "type": "string", "enum": ["LEFT", "RIGHT", "BOTH"] },
+    "magnitude": { "type": "number", "minimum": 0, "maximum": 1 },
+    "target": { "type": ["string", "null"], "description": "Gaze target id or null." },
+    "casting_mode": { "type": "string", "enum": ["full_chant", "short_chant", "silent", "none"] },
+    "quality": {
+      "type": "object",
+      "properties": {
+        "mana_supplied": { "type": "number", "minimum": 0, "maximum": 1 },
+        "chant_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "control_stability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "form_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "q": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "duration_ms": { "type": "number", "minimum": 0, "description": "Sense-to-release casting latency." },
+    "outcome": { "type": "string", "enum": ["cast", "fizzle", "unstable", "cancelled"] }
+  },
+  "additionalProperties": false
+}

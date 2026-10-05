@@ -1,0 +1,16 @@
+experiment: 103-embodied-vs-arbitrary-casting
+version: V2
+blinded: false           # input method is inherently known
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: button press
+    params: {cast_input: button, mana_haptics: none, casts: 15}
+  - id: B
+    label: hand flex
+    params: {cast_input: hand_flex, mana_haptics: none, casts: 15}
+  - id: C
+    label: core gather to flow to release
+    params: {cast_input: core_flow, mana_haptics: full, casts: 15}
+measures: [casting-experience, mana-sensation]

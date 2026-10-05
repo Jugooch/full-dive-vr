@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jugooch/full-dive-vr/schemas/intent-frame.schema.json",
+  "title": "IntentFrame",
+  "description": "Decoded user intent at one instant. The ONLY input gameplay logic receives from the body. Continuous fields are 0..1 activation levels; booleans are not used so decoders can express graded intent.",
+  "type": "object",
+  "required": ["schema", "seq", "timestamp", "source", "confidence"],
+  "properties": {
+    "schema": { "const": "intent-frame/1" },
+    "seq": { "type": "integer", "minimum": 0, "description": "Monotonic frame counter per decoder run; gaps = dropped frames." },
+    "timestamp": { "type": "number", "description": "LSL clock (pylsl.local_clock) seconds at decode time." },
+    "source": {
+      "type": "string",
+      "enum": ["joystick", "keyboard", "emg", "eeg", "gaze", "fusion", "replay", "simulated"],
+      "description": "Which decoder produced this frame."
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+
+    "walk_forward": { "type": "number", "minimum": 0, "maximum": 1, "description": "Locomotion drive. V1: derived from alternating leg step-intent cadence (v = k * f_step)." },
+    "step_left": { "type": "number", "minimum": 0, "maximum": 1, "description": "Instantaneous left-leg step pulse (V1, experiment 005)." },
+    "step_right": { "type": "number", "minimum": 0, "maximum": 1 },
+    "turn_left": { "type": "number", "minimum": 0, "maximum": 1 },
+    "turn_right": { "type": "number", "minimum": 0, "maximum": 1 },
+    "grab_left": { "type": "number", "minimum": 0, "maximum": 1 },
+    "grab_right": { "type": "number", "minimum": 0, "maximum": 1 },
+    "action_strength": { "type": "number", "minimum": 0, "maximum": 1, "description": "Generic intensity of the current action (e.g. swing force)." },
+
+    "core_activation": { "type": "number", "minimum": 0, "maximum": 1, "description": "Synthetic physiology (V2+). C = (EMG - mu_rest) / (mu_max - mu_rest), clipped to [0,1]." },
+    "route_left": { "type": "number", "minimum": 0, "maximum": 1, "description": "Draw-left mana intent D_L (V2+)." },
+    "route_right": { "type": "number", "minimum": 0, "maximum": 1, "description": "Draw-right mana intent D_R (V2+)." },
+    "release": { "type": "number", "minimum": 0, "maximum": 1, "description": "Release gesture (V2+)." },
+    "respiration_phase": { "type": "number", "minimum": -1, "maximum": 1, "description": "Optional: -1 full exhale .. +1 full inhale, from a respiration sensor." },
+    "stillness": { "type": "number", "minimum": 0, "maximum": 1, "description": "1 = body at rest; used by the mana 'Sense' stage." },
+
+    "gaze_target": { "type": ["string", "null"], "description": "Id of the object the user is looking at, if known (Phase 6 fusion)." },
+    "extra": {
+      "type": "object",
+      "additionalProperties": { "type": "number" },
+      "description": "Experiment-specific channels not yet promoted to first-class fields. Promote a field once two experiments use it."
+    }
+  },
+  "additionalProperties": false
+}

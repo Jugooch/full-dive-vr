@@ -1,0 +1,16 @@
+experiment: 010-eeg-motor-execution
+version: EEG
+blinded: false
+randomize: true
+repetitions: 30
+conditions:
+  - id: A
+    label: right hand movement
+    params: {task: move_right_hand, channels: [C3, Cz, C4]}
+  - id: B
+    label: left hand movement
+    params: {task: move_left_hand, channels: [C3, Cz, C4]}
+  - id: R
+    label: rest
+    params: {task: rest, channels: [C3, Cz, C4]}
+measures: []

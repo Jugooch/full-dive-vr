@@ -1,0 +1,16 @@
+experiment: 004-emg-multi-intent
+version: V1
+blinded: false
+randomize: false
+repetitions: 1
+conditions:
+  - id: A
+    label: logistic regression
+    params: {classifier: logreg, features: [mav, rms, var, wl, env_peak], classes: [rest, left_hand, right_hand, walk_pulse_l, walk_pulse_r]}
+  - id: B
+    label: LDA
+    params: {classifier: lda, features: [mav, rms, var, wl, env_peak], classes: [rest, left_hand, right_hand, walk_pulse_l, walk_pulse_r]}
+  - id: C
+    label: random forest
+    params: {classifier: random_forest, features: [mav, rms, var, wl, env_peak], classes: [rest, left_hand, right_hand, walk_pulse_l, walk_pulse_r]}
+measures: [intent-control]

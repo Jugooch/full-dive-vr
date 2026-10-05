@@ -1,0 +1,13 @@
+experiment: 012-eeg-in-vr
+version: EEG
+blinded: false
+randomize: true
+repetitions: 1
+conditions:
+  - id: A
+    label: portal selection
+    params: {input: eeg, task: portal_select, confidence_threshold: 0.7, dwell_ms: 1000, trials: 20}
+  - id: B
+    label: hand glow
+    params: {input: eeg, task: hand_glow, confidence_threshold: 0.7, dwell_ms: 1000, trials: 20}
+measures: [intent-control]

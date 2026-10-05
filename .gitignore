@@ -1,0 +1,52 @@
+# ---- Data: raw recordings never go in git (see data/README.md) ----
+data/**/*.xdf
+data/**/*.xdf.gz
+data/**/*.csv.raw
+data/**/*.bin
+data/**/*.wav
+data/**/*.mp4
+data/raw/
+data/scratch/
+!data/**/README.md
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+build/
+dist/
+
+# ---- PlatformIO / firmware ----
+firmware/**/.pio/
+firmware/**/.vscode/
+firmware/**/include/secrets.h
+
+# ---- Unreal Engine ----
+unreal/**/Binaries/
+unreal/**/Build/
+unreal/**/DerivedDataCache/
+unreal/**/Intermediate/
+unreal/**/Saved/
+unreal/**/.vs/
+unreal/**/*.sln
+unreal/**/*.VC.db
+unreal/**/*.opensdf
+unreal/**/*.sdf
+unreal/**/*.suo
+unreal/**/*.xcodeproj
+unreal/**/*.xcworkspace
+unreal/**/Plugins/**/Binaries/
+unreal/**/Plugins/**/Intermediate/
+
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp

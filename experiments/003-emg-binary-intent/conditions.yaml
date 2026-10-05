@@ -1,0 +1,16 @@
+experiment: 003-emg-binary-intent
+version: V0
+blinded: false
+randomize: false
+repetitions: 1
+conditions:
+  - id: A
+    label: same-session test
+    params: {decoder: threshold, signal: envelope, activation_threshold_k: 3, trials: 50}
+  - id: B
+    label: reattach and recalibrate
+    params: {decoder: threshold, signal: envelope, activation_threshold_k: 3, trials: 50, reattach_electrodes: true}
+  - id: C
+    label: rest-only false activation
+    params: {decoder: threshold, signal: envelope, activation_threshold_k: 3, rest_duration_s: 300}
+measures: [intent-control]
