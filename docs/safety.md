@@ -24,8 +24,14 @@ category. There is a huge amount of unexplored territory on the read-only + phys
 ## Electrical
 
 - **Biosignal electronics on a body are never mains-coupled.** MyoWare sensors run from the battery Power
-  Shield. The EMG ESP32 connects to a laptop **running on battery (charger unplugged)** or through a **USB
-  isolator**. Same for EEG: OpenBCI specifies battery-only operation for Cyton [S60], and PiEEG warns it is
+  Shield, **one per sensor**. The EMG ESP32 connects to a laptop **running on battery (charger unplugged)** or
+  through the **Olimex USB-ISO** galvanic isolator. **Never use the isolator's external power jack**; per Olimex
+  its power lines aren't isolated from the PC side.
+- **Never charge while worn.** Disconnect the Power Shield's USB-C before electrodes go on; SparkFun says to
+  disconnect it from the sensor while charging.
+- **Protect the ESP32 input.** MyoWare ENV spans 0–VIN and the Power Shield is an *unregulated* LiPo (up to
+  4.2 V). Every ENV line goes through the 12 kΩ / 15 kΩ divider, verified with a multimeter (< 2.5 V at the
+  pin) before the ESP32 or a person is connected. See `hardware/bringup-v0.md`. Same for EEG: OpenBCI specifies battery-only operation for Cyton [S60], and PiEEG warns it is
   not a medical device and needs complete battery isolation from mains [S44].
 - No consumer device here is a medical device. Nothing is used for diagnosis or treatment.
 - Fans, bass-shaker amps and other mains-powered actuators are physically separate from anything with

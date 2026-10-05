@@ -17,6 +17,17 @@ Template:
 
 ---
 
+## 2026-10-05 — Hardware review before ordering V0
+- External review of the repo found one must-fix: MyoWare ENV spans 0–VIN and the Power Shield LiPo is
+  unregulated up to 4.2 V (verified on SparkFun's pages), above what an ESP32 pin tolerates. Fixed: required 12k/15k
+  divider per ENV line; emg-streamer 0.2.0 reports sensor millivolts (divider undone); profiles carry `full_scale_mv`.
+- BOM completed: Olimex USB-ISO (never its power jack), resistors, breadboard/headers/cables/straps, 5 electrode
+  packs, 6 motors, piezo for latency ground truth, multimeter. One Power Shield per EMG sensor (V1, V2), second mux
+  (V2), haptic 5 V rail (Phase 4), EEG accessories and eye tracking noted as incomplete/deferred stages.
+- haptics-controller 0.2.0: explicit ERM overdrive clamp (~3.0 V), optional second mux at 0x71, motor current via DRV VIN.
+- Experiment 000: physical (piezo) onset now required for the final ≤20 ms gate.
+- Both firmware projects compile for `featheresp32` (PlatformIO). Bring-up order: `hardware/bringup-v0.md`.
+
 ## 2026-10-05 — Unreal project + PartialDiveBridge
 - Unreal 5.8 VR template project created (`unreal/PartialDiveVR/PartialDiveVR/`), converted to C++.
 - Headset: Oculus Rift S (PCVR, inside-out tracking, OpenXR via the Meta PC app). Quest not needed.

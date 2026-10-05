@@ -16,7 +16,7 @@ A full avatar (torso, arms, hands, legs, feet) with the camera at the avatar's e
 
 ## Hardware
 
-- VR headset + VR-capable PC (Quest 3-class is enough; don't upgrade yet)
+- VR headset (Oculus Rift S) + VR-capable PC (the research says use what you have; don't upgrade yet)
 - Comfortable reclining chair
 - Standard controllers
 

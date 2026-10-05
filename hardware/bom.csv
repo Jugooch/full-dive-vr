@@ -1,25 +1,43 @@
 stage,item,qty,unit_price_usd_2026,purpose,source_ref,status
-0,VR-capable PC,1,,Unreal 5.8 + PCVR,,owned?
+0,VR-capable PC,1,,Unreal 5.8 + PCVR,,owned
 0,VR headset (Oculus Rift S),1,,visual world via OpenXR (Meta PC app runtime),S47;S48,owned
 0,Reclining chair,1,,body support,,owned?
-1,ESP32 dev board (HUZZAH32),2,20,EMG streamer + haptics controller,S55,to-buy
-1,DRV2605L haptic driver,4,8,waveform haptics per zone,S54,to-buy
-1,ERM/LRA vibration motor,4,2,spatial touch zones,,to-buy
-1,TCA9548A I2C multiplexer,1,7,multiple DRV2605L at fixed 0x5A (added during repo setup),,to-buy
-2,MyoWare 2.0 Muscle Sensor,1,43,forearm intent (V0),S31;S57,to-buy
-2,MyoWare 2.0 Power Shield,1,16,battery power / isolation,S59,to-buy
-2,Snap electrodes (pack of 10),3,10,consumable,S57,to-buy
-2,USB isolator (ADuM-based),1,30,mains isolation for EMG MCU (added during repo setup),,to-buy
+0,Digital multimeter,1,30,verify MyoWare ENV max and divider output BEFORE connecting to ESP32 or a person,,to-buy if not owned
+0,Soldering iron + solder + heat-shrink,1,,permanent wiring after breadboard validation,,to-buy if not owned
+1,Adafruit HUZZAH32 ESP32 Feather (exact board firmware targets),2,20,EMG streamer + haptics controller (PlatformIO board featheresp32),S55,to-buy
+1,Adafruit DRV2605L haptic driver (#2305),4,8,waveform haptics per zone,S54,to-buy
+1,TCA9548A I2C multiplexer breakout (Adafruit/SparkFun),1,9,multiple DRV2605L at fixed 0x5A,,to-buy
+1,Adafruit vibrating mini motor disc 10mm ERM (#1201),6,1.95,4 zones + 2 spares; 2.5-3.8V rated ~60mA@3V,,to-buy
+1,Piezo disc (or small accelerometer) for latency ground truth,2,3,physical actuator-onset timing; REQUIRED for exp 000 final gate,,to-buy
+1,Breadboard + jumper wire kit (M/M + M/F),1,15,bring-up before soldering anything wearable,,to-buy
+1,0.1in breakaway headers + hook-up wire,1,8,MyoWare VIN/GND/ENV pads + final wiring,,to-buy
+1,USB cables: micro-USB data cables for HUZZAH32 (x2) + USB-C for Power Shield charging,3,5,easy to discover you lack one; must be data-capable,,to-buy
+1,Velcro straps / soft elastic sleeves,1,12,removable motor + electronics mounting (forearms/chest/shoulder),,to-buy
+2,MyoWare 2.0 Muscle Sensor (buy direct from SparkFun),1,43,forearm intent (V0),S31;S57,to-buy
+2,MyoWare 2.0 Power Shield (DEV-21868; 40mAh LiPo built in; do NOT buy another battery),1,15.95,battery power / isolation; UNREGULATED up to 4.2V,S59,to-buy
+2,24mm Ag/AgCl snap electrodes (SEN-12969 10-pack),5,9.95,single-use; exp 003 includes remove/reattach cycles,S57,to-buy
+2,1% resistor assortment (E12/E24) [divider: 12k top / 15k bottom per ENV],1,12,REQUIRED MyoWare ENV (0-4.2V) -> ESP32 ADC protection,,to-buy
+2,10nF ceramic capacitors (optional ADC filter),5,0.2,optional anti-alias/settling cap at ADC pin,,optional
+2,Olimex USB-ISO galvanic USB isolator (never use its external power jack),1,21,isolates EMG ESP32 from mains-powered PC (1000VDC; USB Full Speed),,to-buy
+2,5V supply for haptic rail (V0 bench: Feather USB pin is enough),0,,motors powered via DRV2605L VIN not the 3.3V regulator,,note
 3,MyoWare 2.0 Muscle Sensor,2,43,left/right leg locomotion (V1),S31,later
-4,DRV2605L haptic driver,4,8,zones 5-8,S54,later
-4,ERM/LRA vibration motor,4,2,zones 5-8,,later
+3,MyoWare 2.0 Power Shield,2,15.95,one per EMG sensor stack (V1 legs),S59,later
+3,24mm electrodes 10-pack,5,9.95,consumable for 3-sensor sessions,S57,later
+3,1% resistors for 2 more ENV dividers,0,,covered by stage 2 assortment,,note
+4,Adafruit DRV2605L haptic driver,4,8,zones 5-8,S54,later
+4,Vibrating mini motor disc 10mm ERM,6,1.95,zones 5-8 + spares,,later
+4,Dedicated 5V >=2A supply + barrel jack + common-ground wiring,1,15,haptic rail for 8 zones (and fan driver logic),,later
 4,Dayton Audio BST-1 bass shaker,1,66,whole-body impact (55-78),S61,later
 4,Small audio amplifier for BST-1,1,,drive bass shaker,,later
 4,PC/blower fans + MOSFET driver + 12V PSU,1,40,directional airflow,,later
 4,bHaptics TactSuit Air (optional),1,320,dense body haptics comparison,S62,optional
 V2,MyoWare 2.0 Muscle Sensor (abdomen),1,43,mana core gather,S31,later
-V2,Extra vibration motors + drivers (flow path),4,10,core->hand flow,S54,later
+V2,MyoWare 2.0 Power Shield,1,15.95,one per EMG sensor stack (abdomen),S59,later
+V2,Second TCA9548A mux (address 0x71) [or reuse chest/shoulder/forearm zones],1,9,>8 haptic zones; firmware 0.2.0 supports mux 0x71,,later
+V2,DRV2605L + motor discs for flow path (core/upper arm/hand),4,10,core->hand flow,S54,later
 V2,Respiration/stretch sensor (optional),1,,breathing signal,,optional
 EEG,OpenBCI Ganglion,1,624.99,first EEG (4ch 200Hz),S65;S66,deferred
 EEG,OpenBCI Cyton (alternative),1,1249,8ch 250Hz,S39;S67,deferred
 EEG,Neurosity Crown (alternative),1,1499,8ch dry C3/C4/CP3/CP4,S38;S69,deferred
+EEG,Electrodes/headgear/paste/cables for chosen board,1,,board shortlist above is not a complete EEG BOM; spec when board is chosen,,deferred
+Fusion,Eye tracking (Rift S has none),1,,Phase 6 gaze; until then gaze = head direction; spec as its own stage,,deferred

@@ -24,7 +24,8 @@ def _emg_source(profile: dict, simulate: bool, active=None):
     if simulate:
         rate = profile["emg"].get("sample_rate_hz", 500)
         return names, SimulatedEMGSource(len(names), rate_hz=rate, active=active, realtime=True)
-    return names, SerialEMGSource(profile["emg"]["port"], len(names))
+    return names, SerialEMGSource(profile["emg"]["port"], len(names),
+                                  full_scale_mv=profile["emg"].get("full_scale_mv", 4200.0))
 
 
 # ---------------------------------------------------------------- session

@@ -3,6 +3,7 @@
 | Folder / file | Contents |
 |---|---|
 | [`profiles/`](profiles/) | One YAML per physical setup: sensors, placements, ports, intent mapping, zone → channel |
+| [`bringup-v0.md`](bringup-v0.md) | **Step-by-step V0 bring-up**: MyoWare alone → divider → EMG ESP32 → one motor → four → full loop |
 | [`bom.csv`](bom.csv) | Bill of materials by stage (2026 prices from the research; re-check before buying) |
 | [`wiring/`](wiring/) | Wiring diagrams and photos of each build revision (LFS for images) |
 | [`pod/`](pod/) | Sensory recliner / pod: mechanical design, CAD (`.step`/`.stl` via LFS), build notes |

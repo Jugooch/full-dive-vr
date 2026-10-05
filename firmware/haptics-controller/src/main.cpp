@@ -2,7 +2,12 @@
 // Protocol: schemas/haptic-command.md (haptic-command/1). Zone names are NOT known here.
 //
 // Every DRV2605L has the same fixed I2C address (0x5A), so each sits behind its own TCA9548A channel.
-// Up to 8 drivers per mux; add a second mux at 0x71 for more zones.
+// Channels 0-7 live on the mux at 0x70; channels 8-15 on an optional second mux at 0x71 (A0 jumper set).
+//
+// POWER: the motors draw their current through each DRV2605L's VIN, NOT the ESP32 3.3 V regulator.
+// Feed DRV2605L VIN from a 5 V rail (V0 bench: the Feather's USB pin; Phase 4: a dedicated 5 V >= 2 A
+// supply), with grounds common. Drive amplitude is capped in software by OD_CLAMP below, so 3 V-rated
+// ERMs stay in spec on a 5 V rail. See README "Power".
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -12,8 +17,16 @@
 #define FW_VERSION "dev"
 #endif
 
-static const uint8_t MUX_ADDR = 0x70;
-static const uint8_t NUM_CHANNELS = 8;             // DRV2605L boards on mux ports 0..7
+static const uint8_t MUX_ADDRS[] = {0x70, 0x71};   // second mux optional (auto-detected)
+static const uint8_t NUM_MUXES = sizeof(MUX_ADDRS);
+static const uint8_t NUM_CHANNELS = 8 * NUM_MUXES;  // DRV2605L boards on mux ports; absent ones are skipped
+
+// ERM open-loop overdrive clamp: V = OD_CLAMP * 21.96 mV (DRV2605L datasheet). 0x88 = 136 -> ~2.99 V,
+// within the Adafruit #1201 disc motor's 2.5-3.8 V rating. Set explicitly instead of trusting the default.
+#ifndef ERM_OD_CLAMP
+#define ERM_OD_CLAMP 0x88
+#endif
+static const uint8_t DRV2605_REG_OD_CLAMP = 0x17;
 static const uint8_t FAN_PINS[] = {25, 26, 27};    // PWM -> MOSFET/fan driver, never direct
 static const uint8_t NUM_FANS = sizeof(FAN_PINS);
 
@@ -27,10 +40,21 @@ uint8_t fanDuty[NUM_FANS] = {0};
 uint32_t lastCommand = 0;
 String line;
 
-void muxSelect(uint8_t ch) {
-  Wire.beginTransmission(MUX_ADDR);
-  Wire.write(1 << ch);
+bool muxPresent[NUM_MUXES] = {false};
+
+void muxWrite(uint8_t mux, uint8_t mask) {
+  Wire.beginTransmission(MUX_ADDRS[mux]);
+  Wire.write(mask);
   Wire.endTransmission();
+}
+
+// Select one DRV2605L: open its port on its mux and close every port on the other mux(es),
+// otherwise two drivers at 0x5A would answer at once.
+void muxSelect(uint8_t ch) {
+  const uint8_t target = ch / 8;
+  for (uint8_t m = 0; m < NUM_MUXES; m++) {
+    if (muxPresent[m]) muxWrite(m, m == target ? (1 << (ch % 8)) : 0);
+  }
 }
 
 void setRealtime(uint8_t ch, uint8_t value) {
@@ -93,7 +117,9 @@ void handle(const String &cmd) {
     case 'I': {
       uint8_t count = 0;
       for (uint8_t ch = 0; ch < NUM_CHANNELS; ch++) count += present[ch];
-      Serial.printf("ID haptics-controller %s channels=%u fans=%u\n", FW_VERSION, count, NUM_FANS);
+      Serial.printf("ID haptics-controller %s channels=%u fans=%u muxes=%u%s\n", FW_VERSION, count, NUM_FANS,
+                    (unsigned)muxPresent[0] + (NUM_MUXES > 1 ? (unsigned)muxPresent[1] : 0u),
+                    count == 0 ? " WARNING:no-drivers-found" : "");
       return;
     }
     default: Serial.println("ERR unknown");
@@ -106,7 +132,12 @@ void setup() {
   Wire.setClock(400000);
   for (uint8_t f = 0; f < NUM_FANS; f++) { pinMode(FAN_PINS[f], OUTPUT); analogWrite(FAN_PINS[f], 0); }
 
+  for (uint8_t m = 0; m < NUM_MUXES; m++) {
+    Wire.beginTransmission(MUX_ADDRS[m]);
+    muxPresent[m] = Wire.endTransmission() == 0;
+  }
   for (uint8_t ch = 0; ch < NUM_CHANNELS; ch++) {
+    if (!muxPresent[ch / 8]) continue;
     muxSelect(ch);
     present[ch] = drv.begin();
     if (present[ch]) {
@@ -114,6 +145,7 @@ void setup() {
       drv.useLRA();
 #else
       drv.useERM();
+      drv.writeRegister8(DRV2605_REG_OD_CLAMP, ERM_OD_CLAMP);
 #endif
       drv.selectLibrary(1);
       drv.setRealtimeValue(0);

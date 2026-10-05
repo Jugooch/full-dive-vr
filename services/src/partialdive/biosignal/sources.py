@@ -1,9 +1,10 @@
 """EMG sources.
 
 `SerialEMGSource` reads the ESP32 `emg-streamer` firmware (see firmware/emg-streamer/README.md):
-    E,<device_millis>,<v0>,<v1>,...\n
-Values are raw 12-bit ADC readings of the MyoWare ENV (envelope) output — the research recommends
-starting with the envelope rather than raw EMG.
+    E,<device_millis>,<env_mv0>,<env_mv1>,...\n
+Values are the MyoWare ENV (envelope) voltage at the sensor in millivolts (the firmware undoes the
+input divider), normalized here by `full_scale_mv` (the Power Shield's 4.2 V maximum). The research
+recommends starting with the envelope rather than raw EMG.
 
 `SimulatedEMGSource` produces plausible rest noise + contraction bursts so every downstream piece
 (decoder, Unreal bridge, haptic loop) can be developed before hardware arrives.
@@ -28,12 +29,11 @@ class Sample:
 
 
 class SerialEMGSource:
-    ADC_FULL_SCALE = 4095.0  # ESP32 12-bit ADC
-
-    def __init__(self, port: str, n_channels: int, baud: int = 921600):
+    def __init__(self, port: str, n_channels: int, baud: int = 921600, full_scale_mv: float = 4200.0):
         import serial  # optional dependency: pip install partialdive[hardware]
 
         self.n_channels = n_channels
+        self.full_scale_mv = full_scale_mv
         self._ser = serial.Serial(port, baud, timeout=1)
 
     def __iter__(self) -> Iterator[Sample]:
@@ -48,7 +48,7 @@ class SerialEMGSource:
                 raw = np.array([float(p) for p in parts[2:]])
             except ValueError:
                 continue
-            yield Sample(local_clock(), raw / self.ADC_FULL_SCALE)
+            yield Sample(local_clock(), raw / self.full_scale_mv)
 
     def close(self) -> None:
         self._ser.close()

@@ -18,9 +18,12 @@ The loop can run end to end with a median under **150 ms** from muscle onset to 
 
 ## Hardware
 
-- PCVR headset (Quest-class over Link is fine)
-- ESP32 + 1× MyoWare 2.0 (forearm) + DRV2605L + 1 vibration motor
-- Optional: a photodiode on the headset lens and a piezo/accelerometer on the actuator, read by a second ESP32 channel, to time display and motor onsets physically
+- PCVR headset (Oculus Rift S)
+- ESP32 + 1× MyoWare 2.0 (forearm, with input divider) + DRV2605L + 1 vibration motor
+- **Piezo disc (or accelerometer) on the actuator**, read by an ESP32 ADC channel, to time the motor's
+  *physical* onset. **Required for the final gate.** Software timestamps stop at "command received";
+  an ERM motor also has mechanical spin-up time.
+- Optional: a photodiode on the headset lens to time display onset
 
 ## Software
 
@@ -40,7 +43,9 @@ The loop can run end to end with a median under **150 ms** from muscle onset to 
 1. Start all LSL streams and LabRecorder, and confirm clock sync (LSL time-sync offsets logged).
 2. Condition A: 50 brief forearm contractions, at least 3 s apart. Each fires grab → haptic.
 3. Condition B: 50 key presses at the same pace.
-4. Optionally repeat with the photodiode/accelerometer attached to get physical ground truth.
+4. Repeat with the piezo attached for physical ground truth (required for the gate; see below).
+   Firmware support (a probe command that fires a channel and reports piezo onset in µs) is to be added
+   to `haptics-controller` when the piezo arrives.
 
 ## Measures
 
@@ -50,7 +55,8 @@ The loop can run end to end with a median under **150 ms** from muscle onset to 
 ## Success criteria / gate
 
 - Median EMG-onset → virtual-response latency **< 150 ms**, p95 recorded
-- Median collision → actuator onset **≤ 20 ms**
+- Median collision → **physical** actuator onset **≤ 20 ms**, measured with the piezo/accelerometer.
+  A software-only run (collision → command received) is a useful first pass but **does not pass the gate**.
 - Every hop is timestamped in one XDF file. This gate opens 002 and 003.
 
 ## Safety

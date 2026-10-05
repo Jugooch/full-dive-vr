@@ -5,6 +5,7 @@ emg:
   device: MyoWare 2.0 (ENV output) -> ESP32 emg-streamer
   port: COM4            # edit per machine
   sample_rate_hz: 1000
+  full_scale_mv: 4200   # Power Shield LiPo max; firmware reports ENV in sensor mV (divider undone)
   channels:
     - {index: 0, name: right_forearm, placement: "forearm flexor group, per MyoWare 2.0 placement guide"}
 intent_mapping:
